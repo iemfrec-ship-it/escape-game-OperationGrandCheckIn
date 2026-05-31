@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏨 The Meridian Hotel — Escape Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nv:#0D1B3E;--nv2:#1B2F6B;--nvl:#E8EDF8;
+  --gd:#B8972A;--gd2:#D4B44A;--gdl:#FAF6E4;
+  --cr:#F8F5EF;--cr2:#EDE8DF;
+  --red:#9B1C1C;--green:#1E5E32;
+  --bg:linear-gradient(150deg,#F0EDE8 0%,#F8F5EF 50%,#EEF0F5 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);min-height:100vh;background-attachment:fixed;color:#222}
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
+.page{max-width:800px;margin:0 auto;padding:16px 18px 44px}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 16px rgba(13,27,62,.07);padding:22px;margin-bottom:13px}
+.card-nv{border-top:3px solid var(--nv)}
+.card-gd{border-top:3px solid var(--gd)}
+.card-rd{border-top:3px solid var(--red)}
+/* ─ Buttons ─ */
+.btn{border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;border-radius:8px;padding:10px 22px;font-size:.87rem;display:inline-flex;align-items:center;gap:6px;transition:transform .12s,box-shadow .12s,background .12s;letter-spacing:.01em}
+.btn:active{transform:scale(.96)!important}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
+.btn-nv{background:var(--nv);color:#fff;box-shadow:0 3px 0 #060F24}
+.btn-nv:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #060F24}
+.btn-gd{background:var(--gd);color:#fff;box-shadow:0 3px 0 #7A6118}
+.btn-gd:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #7A6118}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 3px 0 #5C0E0E}
+.btn-red:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #5C0E0E}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 3px 0 #0D3318}
+.btn-green:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #0D3318}
+.btn-gray{background:#E4E4E4;color:#555}
+.btn-gray:hover:not(:disabled){background:#D5D5D5}
+.btn-outline{background:transparent;color:rgba(255,255,255,.9);border:2px solid rgba(255,255,255,.55)}
+.btn-outline:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.85)}
+.lg{font-size:.96rem;padding:13px 32px}
+.sm{font-size:.76rem;padding:6px 13px}
+.full{width:100%;justify-content:center}
+/* ─ Header ─ */
+.hdr{background:var(--nv);padding:11px 0;position:sticky;top:0;z-index:30;box-shadow:0 3px 14px rgba(13,27,62,.28)}
+.hdr-in{max-width:800px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px}
+/* ─ Progress ─ */
+.pd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;transition:all .3s;flex-shrink:0}
+.pd-done{background:var(--gd);color:#fff}
+.pd-active{background:#fff;color:var(--nv);box-shadow:0 0 0 3px rgba(255,255,255,.3);animation:pls .9s ease-in-out infinite}
+.pd-future{background:rgba(255,255,255,.15);color:rgba(255,255,255,.4)}
+.pl{flex:1;height:2px;margin:0 3px;transition:background .3s}
+.plbl{font-size:.55rem;font-weight:700;color:rgba(255,255,255,.45);text-align:center;margin-top:2px}
+/* ─ Score pill ─ */
+.sc{background:linear-gradient(135deg,var(--gd),var(--gd2));color:#fff;padding:5px 15px;border-radius:50px;font-weight:800;font-size:.86rem;white-space:nowrap;box-shadow:0 2px 8px rgba(184,151,42,.35)}
+/* ─ Input ─ */
+input{font-family:'Inter',sans-serif;border:1.5px solid #D8D0C4;border-radius:8px;padding:10px 13px;font-size:.9rem;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;background:#FDFCFA}
+input:focus{border-color:var(--nv);box-shadow:0 0 0 3px rgba(13,27,62,.1)}
+/* ─ QCM ─ */
+.opt{display:flex;align-items:center;gap:9px;padding:10px 14px;border:1.5px solid #E0D9D0;border-radius:10px;margin-bottom:7px;cursor:pointer;font-weight:600;font-size:.87rem;transition:all .15s}
+.opt:hover{border-color:var(--nv2);background:var(--nvl)}
+.opt.sel{border-color:var(--nv);background:#EEF1FA}
+.opt.right{border-color:var(--green);background:#EEF5EE}
+.opt.wrong{border-color:var(--red);background:#FBF0F0}
+.let{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.73rem;font-weight:800;flex-shrink:0;transition:all .15s}
+/* ─ V/F ─ */
+.vfr{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1.5px solid #E0D9D0;border-radius:10px;margin-bottom:7px;flex-wrap:wrap;transition:all .15s}
+.tvf{padding:5px 13px;border-radius:6px;border:1.5px solid;cursor:pointer;font-weight:700;font-size:.78rem;transition:all .15s;font-family:'Inter',sans-serif}
+/* ─ Matching ─ */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mi{padding:9px 12px;border:1.5px solid #E0D9D0;border-radius:10px;cursor:pointer;font-weight:600;font-size:.82rem;min-height:50px;display:flex;align-items:center;transition:all .15s;line-height:1.35}
+.mi:hover:not(.mu):not(.mok):not(.mko){border-color:var(--gd);background:var(--gdl)}
+.mi.msel{border-color:var(--gd);background:var(--gdl);box-shadow:0 0 0 3px rgba(184,151,42,.15)}
+.mi.mu{opacity:.38;cursor:default;border-style:dashed}
+.mi.mok{border-color:var(--green);background:#EEF5EE;opacity:1;cursor:default}
+.mi.mko{border-color:var(--red);background:#FBF0F0;opacity:1;cursor:default}
+/* ─ Situation ─ */
+.sit{background:linear-gradient(135deg,#F0F2F8,#FAF6E4);border:1.5px solid var(--gd);border-radius:13px;padding:17px}
+.slbl{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gd);margin-bottom:2px}
+.sval{font-weight:600;font-size:.89rem;margin-bottom:11px;line-height:1.5;color:#333}
+.hint{background:var(--gdl);border:1.5px dashed var(--gd);border-radius:10px;padding:9px 13px;font-size:.82rem;font-weight:700;color:#6B4F10}
+/* ─ Reading ─ */
+.rtxt{background:#F8F6F2;border-left:3px solid var(--gd);padding:14px 16px;border-radius:0 10px 10px 0;font-size:.87rem;line-height:1.82;margin-bottom:13px;color:#333;font-style:italic}
+/* ─ Indice ─ */
+.ibx{background:linear-gradient(135deg,var(--nv),var(--nv2));border-radius:16px;padding:26px;text-align:center}
+.iwd{font-family:'Cormorant Garamond',Georgia,serif;font-size:2.6rem;font-weight:700;color:#fff;letter-spacing:.06em;text-shadow:0 3px 0 rgba(0,0,0,.2)}
+/* ─ Stars ─ */
+.stars{font-size:1.4rem;letter-spacing:2px;color:var(--gd)}
+/* ─ Achievement ─ */
+.achv{background:linear-gradient(135deg,var(--nv),var(--nv2));border-radius:13px;padding:14px 18px;text-align:center;margin-bottom:11px}
+/* ─ Banners ─ */
+.ok{background:#EEF5EE;border:1.5px solid var(--green);border-radius:10px;padding:11px;font-weight:700;color:#1E4C28;font-size:.87rem}
+.ko{background:#FBF0F0;border:1.5px solid var(--red);border-radius:10px;padding:11px;font-weight:700;color:#6B1212;font-size:.87rem}
+/* ─ Modal / Animations ─ */
+@keyframes fadein{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pls{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.fadein{animation:fadein .3s ease-out}
+.chip{background:var(--nv);color:#fff;padding:3px 11px;border-radius:6px;font-weight:700;font-size:.77rem;display:inline-block;margin:2px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--cr2),transparent);margin:18px 0}
+@media(max-width:580px){.mg{grid-template-columns:1fr}.card{padding:16px;border-radius:11px}.iwd{font-size:1.9rem}.lg{font-size:.9rem;padding:11px 24px}}
+@media print{.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ═══════ DATA ═══════ */
+const Q1=[
+  {q:'What is "check-in" at a hotel?',o:['The process of settling the bill and leaving','The process of registering and receiving your room on arrival','A form completed during a routine room inspection','A service offered exclusively to loyalty programme members'],c:1},
+  {q:'What does "vacancy" mean in a hotel context?',o:['A guest who has extended their stay beyond the booked period','A premium room with additional facilities and services','A complaint formally submitted by a dissatisfied guest','An available room that can be booked by a new guest'],c:3},
+  {q:'What is a "concierge"?',o:['A hotel employee who assists guests with requests, bookings, and local information','A document listing all room types, prices, and availability','A cleaning and room preparation service provided during a stay','The hotel entrance hall and public reception area'],c:0},
+  {q:'What does "complimentary" mean in hotel services?',o:['Available only to guests who have pre-booked the service','A formal acknowledgement of a complaint from a guest','Provided free of charge as a gesture of goodwill','A premium add-on available at an additional cost'],c:2},
+  {q:'What is the "housekeeping" department responsible for?',o:['Welcoming guests and managing the check-in process','Cleaning, maintaining, and preparing guest rooms','Taking and delivering room service orders','Managing and updating the hotel\'s reservation system'],c:1},
+  {q:'What does "room service" mean?',o:['A daily inspection of rooms by hotel management','The process of allocating rooms to arriving guests','A tracking system for maintenance and repair requests','A service that delivers food and drinks to a guest\'s room'],c:3},
+  {q:'What is the "front desk"?',o:['The main reception area where guests check in, check out, and make enquiries','A premium lounge reserved for loyalty programme gold members','The hotel\'s back-office financial and administration department','An early check-in service offered to guests arriving ahead of schedule'],c:0},
+  {q:'What does "occupancy rate" mean?',o:['The total number of complaints logged during a given month','The average nightly cost of a room across all categories','The percentage of available rooms currently occupied by guests','The number of front-desk staff rostered per shift'],c:2},
+  {q:'What is an "amenity" in a hotel?',o:['A written request submitted by a guest to the management team','A feature or facility provided for the comfort and convenience of guests','A formal confirmation document for an advance reservation','A room type designed specifically for business travellers'],c:1},
+  {q:'What does "check-out" mean at a hotel?',o:['An inspection of the room before a new guest takes occupancy','A service used to verify and confirm booking details on arrival','A form completed during the hotel\'s annual quality review','The process of settling the final bill and vacating the room'],c:3}
+];
+const Q2=[
+  {q:'What is a "reservation"?',o:['A payment document confirming that a deposit has been received','A premium service offered exclusively to returning guests','An advance booking securing a room or service at a specified time','A departure form completed by guests on the day of check-out'],c:2},
+  {q:'What does "full board" mean?',o:['A room package that includes all meals throughout the stay','A type of room with a private balcony and premium furnishings','A corporate rate available only to pre-approved business accounts','A loyalty package offering discounts for stays of five nights or more'],c:0},
+  {q:'What is the "lobby" of a hotel?',o:['The hotel\'s private underground car park reserved for guests','A room equipped with audiovisual and conferencing facilities','A premium lounge restricted to platinum-tier loyalty members','The hotel\'s main entrance hall and public circulation area'],c:3},
+  {q:'What does "late check-out" mean?',o:['A priority service allowing VIP guests to access rooms before standard time','Permission granted to a guest to vacate the room after the standard departure time','A financial penalty applied to guests whose accounts are in arrears','A housekeeping procedure initiated before incoming guests occupy a room'],c:1},
+  {q:'What is a "wake-up call"?',o:['A pre-recorded voicemail sent to guests ahead of a planned event','A confirmation message sent when a room is ready for early arrival','A telephone call placed to a guest\'s room at a time they have requested','A courtesy notification sent to guests whose reservation is approaching'],c:2},
+  {q:'What does "valet parking" mean?',o:['A hotel service whereby trained staff park and retrieve a guest\'s vehicle','A secure storage solution for oversized luggage during a guest\'s stay','A complimentary shuttle service between the hotel and the airport','A room upgrade automatically granted to guests returning within 30 days'],c:0},
+  {q:'What is "half board"?',o:['A room option providing access to a shared kitchen and lounge area','A spa and wellness package bundled with overnight accommodation','Accommodation that includes only breakfast and one additional meal per day','A premium offering combining two adjoining rooms for families or groups'],c:3},
+  {q:'What does "tariff" refer to at a hotel?',o:['A premium service reserved exclusively for conference and event delegates','The official schedule of prices for rooms, meals, and additional services','A document itemising all charges accumulated during a guest\'s stay','A formal escalation procedure for unresolved guest complaints'],c:1},
+  {q:'What is a "key card" used for?',o:['An electronic card that grants access to a guest\'s room and certain hotel areas','A summary document listing the charges applied to a guest\'s account','A loyalty card entitling holders to reduced rates on future reservations','A departure form provided to guests to complete before leaving the hotel'],c:0},
+  {q:'What is a "shuttle service" in a hotel context?',o:['A priority check-in lane reserved for guests travelling in business class','A room service upgrade available to guests staying above the sixth floor','A bundled package combining accommodation with access to meeting facilities','A complimentary or paid transport service between the hotel and key destinations'],c:3}
+];
+const T1=`When James arrived at the front desk, there was no queue — a rare occurrence for a Monday morning at The Meridian. The duty receptionist, Claire, had barely completed her briefing from the night team when he appeared, travel bag in hand, clearly expecting to be accommodated without delay.
+
+"I have a reservation under Thompson," he said, placing a printed confirmation on the desk. Claire located the booking without difficulty. The reservation was for a standard double, with check-in scheduled for the following afternoon. James had caught an earlier flight and was hoping to access his room immediately.
+
+Claire explained that the room was not yet available: the previous occupant had checked out only an hour earlier, and housekeeping had not yet cleared it. She offered him use of the luggage storage, complimentary access to the lounge, and breakfast while he waited. She also assured him that the room would, in all likelihood, be ready within the hour.
+
+James accepted the arrangement, though not without expressing mild frustration. Claire made a note on his profile and flagged the booking for priority room preparation — a standard courtesy extended to guests arriving ahead of schedule.`;
+const VF=[
+  {s:"The reception area was unusually quiet when James arrived.",a:true},
+  {s:"Claire had just completed receiving the briefing from the previous shift when James arrived.",a:true},
+  {s:"James arrived at the time specified in his booking.",a:false},
+  {s:"Claire was unable to locate James's booking in the system.",a:false},
+  {s:"The room was unavailable because it had not yet been assigned to James.",a:false},
+  {s:"Claire offered James several alternatives while he waited for his room.",a:true},
+  {s:"James accepted Claire's proposal with no sign of dissatisfaction.",a:false},
+  {s:"The Meridian routinely prioritises room preparation for early-arriving guests.",a:true},
+  {s:"Claire updated James's file to reflect his early arrival.",a:true},
+  {s:"James was told he would have to wait at least two hours for his room.",a:false}
+];
+const T2=`The general manager, Mr. Harrington, convened the weekly front-of-house briefing earlier than usual. Nine members of staff were present: the reception supervisor, the concierge team leader, and three newly recruited receptionists who had completed their induction only the previous day.
+
+Mr. Harrington opened by acknowledging that guest satisfaction scores for the previous month had fallen below the hotel's internal benchmark, reaching 7.8 out of 10. He attributed this primarily to two recurring complaints: inconsistent response times at the front desk, and a failure to personalise interactions with returning guests. "Our guests are not looking for efficiency alone," he said. "They expect to feel recognised."
+
+Three measures were proposed. First, a revised welcome protocol would require all front-desk staff to greet returning guests by name and reference past preferences where the system allowed. Second, a response time target would be enforced for all desk enquiries, with performance reviewed on a weekly basis. Third, the hotel's loyalty programme would be relaunched with a dedicated concierge contact point for top-tier members.
+
+Mr. Harrington closed by reminding the team that the hotel's annual inspection by the national hospitality board was due within six weeks. He made it clear that the standard expected was not merely to recover previous results, but to surpass them.`;
+const Q3=[
+  {q:"What does the unusually early start to the meeting suggest about Mr. Harrington?",o:["He considers the current situation serious enough to require prompt action","He is trying to accommodate the schedules of the newly recruited staff","He is simply following the hotel's standard briefing protocol","He wants to limit the disruption to guest-facing operations during the morning"],c:0},
+  {q:"Why is the presence of the three new receptionists noteworthy?",o:["They had been specifically hired to resolve the guest satisfaction issues","They were participating in a formal briefing with virtually no prior experience","They were the primary cause of the decline in satisfaction scores","They were being formally assessed for a permanent contract"],c:1},
+  {q:"What does the guest satisfaction score reveal about the hotel's recent performance?",o:["The hotel has consistently exceeded its benchmark over several months","The hotel is performing in line with general industry standards","The hotel has not met its own internal performance target","The hotel's results have been stable despite a rise in occupancy"],c:2},
+  {q:"What does Mr. Harrington suggest guests ultimately expect from the hotel?",o:["Faster service and a more streamlined check-in experience","A broader and more personalised range of in-room amenities","Competitive and transparent pricing across all categories","To feel genuinely acknowledged and valued as returning guests"],c:3},
+  {q:"What is the main purpose of the revised welcome protocol?",o:["To ensure returning guests receive a consistent, personalised greeting","To shorten the time required to complete the check-in process","To standardise the procedure for managing guest complaints","To introduce new staff to the hotel's core hospitality values"],c:0},
+  {q:"How will adherence to the response time target be monitored?",o:["Through guest satisfaction questionnaires completed at the end of each stay","Through weekly performance reviews of front-desk response data","Through direct observation and feedback from the concierge team","Through monthly audits conducted by an external hospitality consultant"],c:1},
+  {q:"What is the key change planned for the loyalty programme?",o:["It will be extended to all guests regardless of their membership level","It will be integrated into a national hospitality rewards network","The most valuable members will benefit from a dedicated concierge contact","All members will receive automatic room upgrades upon each arrival"],c:2},
+  {q:"What additional pressure does Mr. Harrington introduce at the close of the meeting?",o:["The need to recruit additional staff before the inspection period begins","The requirement to review all bookings made in the previous six months","The obligation to complete a mandatory refresher training for all staff","The need to not simply match but exceed last year's inspection results"],c:3},
+  {q:"What does Mr. Harrington's closing message reveal about his performance expectations?",o:["He is not content with recovering past performance — he demands genuine improvement","He is confident the proposed measures alone will resolve all issues","He is primarily focused on managing the reputational risk of a poor inspection","He believes the inspection will ultimately confirm the hotel's existing strengths"],c:0},
+  {q:"How would you best describe Mr. Harrington's overall tone throughout the meeting?",o:["Reassuring, with an optimistic outlook on the team's ability to improve","Direct and demanding, with a clear expectation of measurable progress","Diplomatic, balancing recognition of effort with gentle suggestions for improvement","Cautious, expressing doubt about whether the proposed measures will be effective"],c:1}
+];
+const SIT=[
+  {e:'🗝️',t:'Situation Card #1',w:'The Meridian Hotel — Front Desk',who:"Mr. Wallace is a returning guest. He insists he was promised a complimentary upgrade to a junior suite during his last stay. His reservation shows a standard room. He is becoming impatient and mentions an important meeting later that morning.",r:'Receptionist. Handle the situation with tact, verify what can be offered, and propose a solution without undermining hotel policy.',h:'💡 Think about: how to acknowledge a returning guest / how to manage a disputed promise professionally / what alternatives you can offer without making commitments you cannot keep.'},
+  {e:'📞',t:'Situation Card #2 — Rattrapage',w:'The Meridian Hotel — Reception (phone call)',who:"A couple in Room 312 has just called. Their room has a faulty air conditioning unit and the view does not match what was shown in the booking confirmation. They are requesting an immediate room change.",r:'Receptionist responding by phone. Acknowledge the issue, apologise appropriately, and offer practical solutions.',h:'💡 Think about: how to open a professional telephone interaction / how to express empathy while remaining composed / what alternatives you can realistically propose.'}
+];
+const M1=[
+  {w:'Turndown service',d:'An evening housekeeping visit to prepare the room for the night'},
+  {w:'No-show',d:'A guest who fails to arrive without cancelling their reservation'},
+  {w:'Overbooking',d:'Accepting more reservations than rooms are physically available'},
+  {w:'Rack rate',d:'The standard, undiscounted price for a hotel room'},
+  {w:'Guest profile',d:'A record of a guest\'s preferences, stay history, and contact details'},
+  {w:'Upselling',d:'Encouraging a guest to book a higher category room or additional service'},
+  {w:'Walk-in',d:'A guest who arrives at the hotel without a prior reservation'},
+  {w:'Revenue management',d:'Adjusting room prices dynamically to maximise total income'},
+  {w:'Courtesy hold',d:'A temporary reservation made without immediate payment confirmation'},
+  {w:'Corkage fee',d:'A charge applied when guests bring their own wine to the restaurant'}
+];
+const M2=[
+  {w:'Folio',d:'An itemised statement of all charges accumulated during a guest\'s stay'},
+  {w:'PMS',d:'The software used to manage reservations, check-ins, and billing'},
+  {w:'Pre-authorisation',d:'A temporary hold placed on a guest\'s payment card upon arrival'},
+  {w:'Yield',d:'The actual revenue earned compared to the maximum achievable'},
+  {w:'Adjoining rooms',d:'Two separate rooms sharing a connecting internal door'},
+  {w:'Minibar',d:'A small refrigerator in the room stocked with drinks and snacks'},
+  {w:'Soft opening',d:'A period of limited operation before a hotel\'s official public launch'},
+  {w:'Do Not Disturb',d:'A signal indicating a guest does not wish to be entered or contacted'},
+  {w:'Ground handling',d:'The coordination of guest arrivals, departures, and luggage logistics'},
+  {w:'Suite',d:'A premium accommodation unit combining a bedroom and a separate living area'}
+];
+const REP=[
+  {e:'🔔',t:'Incident Report #1',i:'Room 507 — Monday morning',x:"Mr. Crawford, currently in Room 507, contacted the front desk to report that his minibar had not been restocked since his arrival four days ago. A review of the housekeeping log confirmed that the room had been serviced daily but that the minibar restock had been omitted on three consecutive occasions due to an error in the daily task sheet. The duty manager, Ms. Blake, apologised to Mr. Crawford and authorised complimentary minibar access for the remainder of his stay. A fruit basket and a handwritten apology note were arranged for delivery to the room. The housekeeping supervisor was informed, the task sheet was corrected, and the incident was logged in the guest relations system.",h:'💡 Cover: guest complaint / investigation findings / solutions offered / follow-up actions taken.'},
+  {e:'💼',t:'Incident Report #2 — Rattrapage',i:'Room 318 — Monday afternoon',x:"Mrs. Lawson in Room 318 reported at the front desk that her laptop had disappeared from her room. She had last seen it on the desk at approximately 9 AM. The duty manager was notified immediately and the housekeeping team was contacted. The housekeeper assigned to that floor confirmed having seen the laptop during the service visit between 10 and 10:30 AM, but denied removing it. Security reviewed the key card access log for Room 318 and found no irregular entries. No CCTV footage was available for that corridor during the relevant period due to a scheduled system update. The matter was formally logged, and Mrs. Lawson was advised to submit a written complaint to hotel management.",h:'💡 Cover: the report / steps taken / findings from the investigation / outcome and advice given to the guest.'},
+  {e:'🔧',t:'Incident Report #3 — 2e Rattrapage',i:'Ground floor — Monday evening',x:"During a routine inspection of the ground floor facilities, duty manager Mr. Collins identified a significant water leak in the cloakroom adjacent to the main dining room. The maintenance team was contacted immediately and estimated a repair time of two hours. Temporary signage was put in place to redirect guests to alternative facilities on the first floor. The F&B manager was notified to ensure the dining service was not disrupted. The leak was contained and fully repaired within the estimated timeframe. A maintenance report was filed, and a full inspection of all ground floor plumbing was recommended as a preventive measure.",h:'💡 Cover: what was found / immediate actions / impact on guests / repair outcome / preventive recommendation.'}
+];
+const WW=['WELCOME','EVERY','GUEST','WITH','CARE'];
+/* ═══════ STATE & UTILS ═══════ */
+let S={scr:'home',tc:'0504',sc:'1234',g:{n:'',p:[]},pts:0,sh:[],rv:[],res:{},wr:[],t0:null,t1:null,l2s1:null,l3i:0,l5i:0,np:1};
+let E={};let F={};
+const shuf=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
+const pass=(n,t=10)=>n>=t*.8;
+const ftm=(s,e)=>{if(!s||!e)return'—';const d=Math.round((e-s)/1e3);return`${0|d/60}min ${d%60}s`;};
+function starRating(n,t=350){const p=n/t;if(p>=.85)return{s:3,msg:'Outstanding service! 🌟',c:true};if(p>=.65)return{s:2,msg:'Good performance 👍',c:true};if(p>=.45)return{s:1,msg:'Passable — à améliorer',c:false};return{s:0,msg:'Score insuffisant',c:false};}
+function stars(n){return`<span class="stars">${'★'.repeat(n)}<span style="opacity:.22">${'★'.repeat(3-n)}</span></span>`;}
+const btn=(t,fn,c='nv',extra='')=>`<button class="btn btn-${c} ${extra}" onclick="${fn}">${t}</button>`;
+function hdr(lvl){
+  const ls=[['🎙️','Vocab'],['📰','Reading'],['🎤','Oral'],['🔗','Match'],['📋','Report']];
+  const pts=ls.map(([e,l],i)=>`${i>0?`<div class="pl" style="background:${i+1<=lvl?'var(--gd)':'rgba(255,255,255,.15)'}"></div>`:''}
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div class="pd ${i+1<lvl?'pd-done':i+1===lvl?'pd-active':'pd-future'}">${i+1<lvl?'✓':e}</div>
+      <div class="plbl">${l}</div>
+    </div>`).join('');
+  return`<div class="hdr noprint"><div class="hdr-in"><div class="prg">${pts}</div><div class="sc">✦ ${S.pts} pts</div></div></div>`;
+}
+function achvBanner(score,total=10){
+  const r=starRating(score*40,350);
+  return`<div class="achv"><div>${stars(r.s)}</div><div style="color:rgba(255,255,255,.9);font-weight:700;font-size:.88rem;margin-top:4px">${score}/${total} — ${r.msg}</div></div>`;
+}
+function indiceScreen(idx,onNext){
+  const w=WW[S.sh[idx]];
+  if(!S.rv.includes(w))S.rv.push(w);
+  const filled=S.rv.map(x=>`<div style="background:var(--nv);color:#fff;padding:6px 16px;border-radius:6px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.15rem;display:inline-block;margin:3px;letter-spacing:.04em">${x}</div>`).join('');
+  const empty=Array.from({length:5-S.rv.length}).map(()=>`<div style="background:#E8E8E8;color:#BBB;padding:6px 16px;border-radius:6px;font-weight:700;font-size:1.1rem;display:inline-block;margin:3px">?</div>`).join('');
+  return`<div class="ibx fadein" style="margin-bottom:13px">
+    <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:7px">Mot secret</div>
+    <div class="iwd">${w}</div>
+    <div style="color:rgba(255,255,255,.6);font-size:.8rem;margin-top:10px">✦ Notez ce mot — ils formeront une phrase</div>
+  </div>
+  <div class="card" style="margin-bottom:13px"><div style="font-weight:700;color:var(--nv);font-size:.9rem;margin-bottom:9px">🔑 Fragments collectés (${S.rv.length}/5)</div>
+    <div style="margin-bottom:7px">${filled}${empty}</div>
+    <p style="color:#AAA;font-size:.76rem;font-style:italic">Les 5 mots forment une phrase à recomposer en fin de mission.</p>
+  </div>
+  <div style="text-align:center">${btn('Mission suivante →',onNext,'gd','lg')}</div>`;
+}
+function lvlIntro(e,t,sub,desc,fn){
+  return`<div class="card card-nv fadein"><div style="text-align:center;margin-bottom:17px">
+    <div style="font-size:2.6rem">${e}</div>
+    <h2 class="serif" style="color:var(--nv);font-size:1.85rem;margin-top:5px">${t}</h2>
+    <div class="divider"></div>
+    <p style="color:var(--gd);font-weight:700;font-size:.83rem;letter-spacing:.05em;text-transform:uppercase">${sub}</p>
+  </div>
+  <div style="background:var(--cr);border-radius:9px;padding:14px;margin-bottom:17px;font-size:.89rem;color:#444;line-height:1.72;border:1px solid var(--cr2)">${desc}</div>
+  <div style="text-align:center">${btn('Commencer la mission ›',fn,'nv','lg')}</div></div>`;
+}
+
+/* ═══════ HOME ═══════ */
+function vHome(){
+  return`<div style="min-height:100vh;display:flex;flex-direction:column;background:var(--nv)">
+  <!-- Background grid -->
+  <div style="position:fixed;inset:0;opacity:.05;pointer-events:none;background:repeating-linear-gradient(0deg,#fff,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff,#fff 1px,transparent 1px,transparent 40px)"></div>
+  <!-- Hero -->
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px 28px;text-align:center;position:relative">
+    <div style="font-size:.72rem;font-weight:700;letter-spacing:.26em;color:var(--gd2);text-transform:uppercase;margin-bottom:10px">The Meridian Hotel &nbsp;✦&nbsp; Escape Game</div>
+    <h1 class="serif" style="font-size:2.7rem;color:#fff;margin-bottom:8px;line-height:1.1">Operation <span style="color:var(--gd2)">Grand Check-In</span></h1>
+    <p style="color:rgba(255,255,255,.6);font-size:.88rem;margin-bottom:36px">English Escape Game — Bac Pro Métiers de l'Accueil</p>
+    <!-- Cards -->
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;width:100%;max-width:520px;margin-bottom:36px">
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:26px 22px;flex:1;min-width:185px;max-width:230px;text-align:center">
+        <div style="font-size:2.2rem;margin-bottom:10px">🛎️</div>
+        <div style="font-weight:700;color:var(--gd2);margin-bottom:5px;font-size:.95rem">Équipe</div>
+        <div style="color:rgba(255,255,255,.55);font-size:.81rem;margin-bottom:18px">Rejoindre la mission</div>
+        ${btn("Check-in →","go('rules')",'gd','full')}
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:26px 22px;flex:1;min-width:185px;max-width:230px;text-align:center">
+        <div style="font-size:2.2rem;margin-bottom:10px">👔</div>
+        <div style="font-weight:700;color:rgba(255,255,255,.85);margin-bottom:5px;font-size:.95rem">Direction</div>
+        <div style="color:rgba(255,255,255,.55);font-size:.81rem;margin-bottom:18px">Interface professeur</div>
+        ${btn('Accès ›',"go('tlg')",'outline','full')}
+      </div>
+    </div>
+    <!-- Info badges -->
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:480px">
+      ${[['🏅','5 Missions','Vocab · Lecture · Oral · Match · Rapport'],['⭐','Points','50 pts par exercice réussi'],['🔑','Code Final','5 fragments à recomposer']].map(([e,t,d])=>
+        `<div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:14px 16px;flex:1;min-width:130px;text-align:center">
+          <div style="font-size:1.4rem;margin-bottom:5px">${e}</div>
+          <div style="font-weight:800;font-size:.82rem;color:var(--gd2);margin-bottom:3px">${t}</div>
+          <div style="color:rgba(255,255,255,.45);font-size:.72rem;line-height:1.45">${d}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer style="border-top:1px solid rgba(255,255,255,.1);text-align:center;padding:14px;color:rgba(255,255,255,.35);font-size:.76rem">
+    Créé par <strong style="color:rgba(255,255,255,.65)">C. iemfre</strong> &nbsp;✦&nbsp;
+    <span style="color:var(--gd);cursor:pointer;font-weight:700" onclick="go('rgpd')">Politique RGPD</span>
+  </footer>
+  </div>`;
+}
+
+/* ═══════ RULES ═══════ */
+function vRules(){
+  const ms=[
+    {n:1,e:'🎙️',t:'Front Desk Briefing',d:'QCM vocabulaire hôtelier — maîtrisez les termes essentiels de la réception.',c:'var(--nv)'},
+    {n:2,e:'📰',t:'Guest Intelligence',d:'Compréhension écrite — deux documents professionnels, deux exercices obligatoires.',c:'var(--gd)'},
+    {n:3,e:'🎤',t:'Live Situation',d:'Expression orale — gérez une situation client en anglais en temps réel.',c:'#6B3B8C'},
+    {n:4,e:'🔗',t:'The Concierge Desk',d:'Correspondance — associez les termes hôteliers à leurs définitions précises.',c:'#8B3A1A'},
+    {n:5,e:'📋',t:"The Duty Manager's Office",d:"Compte rendu oral — présentez un rapport d'incident en anglais.",c:'#1E5E32'}
+  ];
+  return`<div style="min-height:100vh;padding-bottom:30px">
+  <div style="background:var(--nv);padding:24px 20px;color:#fff">
+    <div style="max-width:780px;margin:0 auto;display:flex;align-items:center;gap:14px">
+      <button onclick="go('home')" style="background:rgba(255,255,255,.12);border:none;color:#fff;padding:7px 13px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:700">← Retour</button>
+      <div><div style="font-size:.68rem;font-weight:700;letter-spacing:.18em;color:var(--gd2);text-transform:uppercase">The Meridian Hotel</div><h2 class="serif" style="font-size:1.5rem">Mission Briefing</h2></div>
+    </div>
+  </div>
+  <div class="page">
+    <div class="card" style="border-left:3px solid var(--gd);margin-top:4px">
+      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gd);margin-bottom:8px">🚨 Contexte</div>
+      <p style="color:#444;font-size:.9rem;line-height:1.78">Lundi matin. <strong>The Meridian Hotel</strong> est en crise. Le réceptionniste de nuit a quitté son poste sans passation, trois check-ins VIP sont attendus dans deux heures et le système de réservation est instable. Votre équipe vient d'être recrutée comme agents d'accueil. Trouvez les <strong>5 mots secrets</strong>, recomposez la phrase, entrez le <strong>Master Code</strong> et <strong>sauvez le Meridian</strong>.</p>
+    </div>
+    <div style="font-weight:700;color:var(--nv);margin:17px 0 10px;font-size:.92rem">✦ Les 5 missions</div>
+    <div style="display:grid;gap:8px;margin-bottom:17px">
+      ${ms.map(m=>`<div class="card" style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-left:3px solid ${m.c}">
+        <div style="width:36px;height:36px;border-radius:50%;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">${m.e}</div>
+        <div><div style="font-weight:800;font-size:.9rem;color:#222">Mission ${m.n} — ${m.t}</div><div style="color:#777;font-size:.81rem;margin-top:3px;line-height:1.5">${m.d}</div></div>
+      </div>`).join('')}
+    </div>
+    <div class="card card-gd">
+      <div style="font-weight:800;color:var(--gd);margin-bottom:11px;font-size:.9rem">✦ Règles du jeu</div>
+      <div style="display:grid;gap:7px;font-size:.86rem">
+        ${[['Points','<strong>+50 pts</strong> par exercice réussi (≥ 80% de réponses correctes).'],
+           ['Mission 2','Les 2 exercices sont <strong>obligatoires</strong>. Échec = <strong>−25 pts</strong> + retour Mission 1.'],
+           ['Oral','Missions 3 & 5 : <strong>validation manuelle</strong> par le professeur avec son code.'],
+           ['Code Final','5 fragments révélés dans le désordre. Recomposez la phrase pour valider.'],
+           ['Rapport PDF','Rapport coloré téléchargeable à la fin avec résultats et erreurs détaillées.']
+        ].map(([k,v])=>`<div style="display:flex;gap:10px;background:var(--gdl);padding:9px 12px;border-radius:8px;align-items:flex-start;border:1px solid rgba(184,151,42,.2)"><span style="font-weight:800;color:var(--gd);min-width:70px;flex-shrink:0;font-size:.83rem">${k}</span><span style="color:#555">${v}</span></div>`).join('')}
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:17px">
+      ${btn('✓ Accepter la mission',"go('slg')",'nv','lg')}
+    </div>
+  </div></div>`;
+}
+/* ═══════ LOGIN ═══════ */
+function vLogin(title,next){
+  const isT=next==='tdb';
+  return`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card fadein" style="max-width:375px;width:100%;border-top:3px solid ${isT?'var(--gd)':'var(--nv)'}">
+    <div style="color:#AAA;cursor:pointer;font-size:.82rem;margin-bottom:14px" onclick="go('home')">← Accueil</div>
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:2.4rem">${isT?'👔':'🛎️'}</div>
+      <h2 class="serif" style="color:${isT?'var(--gd)':'var(--nv)'};font-size:1.65rem;margin-top:6px">${title}</h2>
+    </div>
+    <input id="lgc" type="password" placeholder="Entrez le code d'accès" style="margin-bottom:9px" onkeydown="if(event.key==='Enter')doLogin('${next}')">
+    <div id="lge" style="color:var(--red);font-weight:700;font-size:.82rem;min-height:16px;margin-bottom:8px"></div>
+    ${btn('Accéder ›',`doLogin('${next}')`,'nv','full')}
+  </div></div>`;
+}
+function doLogin(next){
+  const v=(document.getElementById('lgc')||{}).value||'';
+  if(v===(next==='tdb'?S.tc:S.sc))go(next);
+  else{const e=document.getElementById('lge');if(e)e.textContent='Code incorrect. Veuillez réessayer.';}
+}
+
+/* ═══════ TEACHER ═══════ */
+function vTeacher(){
+  return`<div style="min-height:100vh;padding:20px"><div style="max-width:700px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:19px;padding-top:6px">
+    <h2 class="serif" style="color:var(--nv);font-size:1.6rem">👔 Direction — Interface Professeur</h2>
+    ${btn('← Accueil',"go('home')",'gray','sm')}
+  </div>
+  <div class="card card-gd"><div style="font-weight:700;color:var(--gd);margin-bottom:11px;font-size:.9rem">✦ Code d'accès équipes</div>
+    <p style="color:#777;font-size:.87rem;margin-bottom:9px">Code actuel : <strong style="color:var(--nv);font-family:monospace;font-size:1.2rem">${S.sc}</strong></p>
+    <div style="display:flex;gap:9px"><input id="nsc" type="text" value="${S.sc}" placeholder="Nouveau code" style="flex:1">
+    ${btn('Enregistrer','saveCode()','nv')}</div>
+    <div id="scs" style="color:var(--green);font-weight:700;font-size:.82rem;min-height:15px;margin-top:6px"></div>
+  </div>
+  <div class="card card-nv"><div style="font-weight:700;color:var(--nv);margin-bottom:11px;font-size:.9rem">✦ Récapitulatif</div>
+    ${[['Master Code','WELCOME EVERY GUEST WITH CARE (fragments révélés dans le désordre)'],
+       ['Points','+50 pts par exercice réussi (≥80%) · −25 pts si échec Mission 2'],
+       ['Mission 2','Les 2 exercices sont obligatoires — 80% requis sur chacun'],
+       ['Oraux (3 & 5)','Validation manuelle avec le code professeur (0504)']
+    ].map(([k,v])=>`<div style="background:var(--nvl);padding:9px 13px;border-radius:8px;margin-bottom:8px;font-size:.85rem"><strong style="color:var(--nv)">${k} :</strong> <span style="color:#555">${v}</span></div>`).join('')}
+  </div>
+  <div class="card card-gd"><div style="font-weight:700;color:var(--gd);margin-bottom:11px;font-size:.9rem">✦ Critères d'évaluation orale</div>
+    ${[['Mission 3 — Situation client','Accueil professionnel, gestion calme d\'une demande difficile, solutions concrètes proposées, ton et vocabulaire hôteliers adaptés.'],
+       ['Mission 5 — Compte rendu','Structure who/what/when/action/result, phrases simples et correctes, vocabulaire professionnel utilisé à bon escient.']
+    ].map(([k,v])=>`<div style="background:var(--gdl);padding:10px 13px;border-radius:8px;border:1px solid rgba(184,151,42,.3);margin-bottom:8px;font-size:.85rem"><strong style="color:var(--gd)">${k} :</strong> <span style="color:#555">${v}</span></div>`).join('')}
+  </div></div></div>`;
+}
+function saveCode(){const v=(document.getElementById('nsc')||{}).value||'';if(v)S.sc=v;const e=document.getElementById('scs');if(e){e.textContent='✓ Code mis à jour';setTimeout(()=>{if(e)e.textContent='';},2200);}}
+
+/* ═══════ GROUP ═══════ */
+function vGroup(){
+  const n=S.np||1;
+  const rows=Array.from({length:n},(_,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:7px;margin-bottom:7px;align-items:center">
+    <input id="fn${i}" type="text" placeholder="JO" value="${F['fn'+i]||''}" oninput="F['fn${i}']=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);rC(${i})" style="text-align:center;font-weight:800;font-family:monospace;letter-spacing:.1em">
+    <input id="ln${i}" type="text" placeholder="SM" value="${F['ln'+i]||''}" oninput="F['ln${i}']=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);rC(${i})" style="text-align:center;font-weight:800;font-family:monospace;letter-spacing:.1em">
+    <div id="chip${i}" style="text-align:center">${F['fn'+i]&&F['ln'+i]?`<span class="chip">${F['fn'+i]}-${F['ln'+i]}</span>`:'<span style="color:#CCC;font-weight:800">--</span>'}</div>
+    <button onclick="if(${n}>1){S.np--;F={};render();}" style="width:27px;height:27px;border:none;background:${n>1?'var(--red)':'#EEE'};color:${n>1?'#fff':'#BBB'};border-radius:50%;cursor:${n>1?'pointer':'not-allowed'};font-weight:800">×</button>
+  </div>`).join('');
+  return`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card fadein" style="max-width:530px;width:100%;border-top:3px solid var(--nv)">
+    <div style="text-align:center;margin-bottom:19px">
+      <div style="font-size:2.4rem">🛎️</div>
+      <h2 class="serif" style="color:var(--nv);font-size:1.65rem;margin-top:6px">Enregistrement de l'équipe</h2>
+      <p style="color:#888;font-size:.83rem;margin-top:3px">Complétez votre fiche avant d'accéder aux missions</p>
+    </div>
+    <label style="font-weight:700;display:block;margin-bottom:6px;font-size:.86rem;color:#333">✦ Nom de l'équipe</label>
+    <input id="gn" type="text" placeholder="Ex : Team Prestige" value="${F.gn||''}" oninput="F.gn=this.value" style="margin-bottom:14px">
+    <label style="font-weight:700;display:block;margin-bottom:6px;font-size:.86rem;color:#333">✦ Membres (${n}/4)</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:7px;margin-bottom:7px;background:#F5F3EF;padding:7px 10px;border-radius:8px">
+      ${['2 lettres prénom','2 lettres nom','ID',''].map(h=>`<div style="font-size:.67rem;font-weight:800;color:#AAA;text-align:center">${h}</div>`).join('')}
+    </div>
+    ${rows}
+    ${n<4?`<div style="margin-bottom:12px">${btn('+ Ajouter un membre','addPart()','gray','sm')}</div>`:''}
+    <div id="ge" style="color:var(--red);font-weight:700;font-size:.82rem;min-height:16px;margin-bottom:10px"></div>
+    ${btn('✓ Valider et commencer','startGame()','nv','full lg')}
+  </div></div>`;
+}
+function rC(i){const e=document.getElementById('chip'+i);if(!e)return;const fn=(F['fn'+i]||'').slice(0,2),ln=(F['ln'+i]||'').slice(0,2);e.innerHTML=fn&&ln?`<span class="chip">${fn}-${ln}</span>`:'<span style="color:#CCC;font-weight:800">--</span>';}
+function addPart(){if(S.np<4)S.np++;render();}
+function startGame(){
+  const name=(document.getElementById('gn')||{}).value||F.gn||'';
+  if(!name.trim()){const e=document.getElementById('ge');if(e)e.textContent='Entrez le nom de l\'équipe';return;}
+  const parts=[];
+  for(let i=0;i<(S.np||1);i++){
+    const fn=(F['fn'+i]||'').toUpperCase().slice(0,2),ln=(F['ln'+i]||'').toUpperCase().slice(0,2);
+    if(!fn||!ln){const e=document.getElementById('ge');if(e)e.textContent='Remplissez tous les participants';return;}
+    parts.push({fn,ln});
+  }
+  S.sh=shuf([0,1,2,3,4]);S.rv=[];S.res={};S.wr=[];S.pts=0;
+  S.g={n:name.trim(),p:parts};S.t0=Date.now();S.t1=null;
+  S.l2s1=null;S.l3i=0;S.l5i=0;F={};go('l1i');
+}
+
+/* ═══════ QCM ═══════ */
+function vQCM(){
+  const{qs,cur=0,ans={},done=false}=E;if(!qs)return'';
+  const q=qs[cur];const L='ABCD';const CC=['var(--nv)','var(--gd)','var(--red)','#6B3B8C'];
+  const dots=qs.map((_,i)=>{const c=done?(ans[i]===qs[i].c?'var(--green)':'var(--red)'):(ans[i]!=null?'var(--nv)':'#D8D0C4');return`<div onclick="E.cur=${i};render()" style="width:8px;height:8px;border-radius:50%;background:${c};cursor:pointer;display:inline-block;margin:2px"></div>`;}).join('');
+  const opts=q.o.map((opt,oi)=>{
+    let bc='#E0D9D0',bg='#fff';
+    if(ans[cur]===oi){bc='var(--nv)';bg='var(--nvl)';}
+    if(done&&oi===q.c){bc='var(--green)';bg='#EEF5EE';}
+    if(done&&ans[cur]===oi&&oi!==q.c){bc='var(--red)';bg='#FBF0F0';}
+    const lbg=ans[cur]===oi?CC[oi]:'#ECE7E0',lc=ans[cur]===oi?'#fff':'#999';
+    const mk=done?(oi===q.c?' ✓':(ans[cur]===oi?' ✗':'')):'';
+    return`<div class="opt ${ans[cur]===oi?'sel':''} ${done&&oi===q.c?'right':''} ${done&&ans[cur]===oi&&oi!==q.c?'wrong':''}" onclick="${done?'':(`E.ans[${cur}]=${oi};render()`)}" style="border-color:${bc};background:${bg}">
+      <div class="let" style="background:${lbg};color:${lc}">${L[oi]}</div>
+      <span style="flex:1">${opt}</span>
+      <span style="font-weight:800;color:${done&&oi===q.c?'var(--green)':'var(--red)'}">${mk}</span>
+    </div>`;
+  }).join('');
+  const allA=Object.keys(ans).length===qs.length;
+  const score=qs.filter((_,i)=>ans[i]===qs[i].c).length;
+  const bot=done
+    ?`<div style="display:flex;gap:9px;width:100%;align-items:center;flex-wrap:wrap;margin-top:4px">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${qs.length} — ${pass(score)?'Mission réussie ✓':'Score insuffisant ✗'}</div>${btn('Continuer ›','qcmDone()','nv')}</div></div>`
+    :(allA?btn('Valider mes réponses','E.done=true;render()','nv'):`<small style="color:#CCC;font-size:.78rem">${Object.keys(ans).length}/${qs.length} répondues</small>`);
+  return`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="color:#AAA;font-size:.79rem;font-weight:700">Question ${cur+1} / ${qs.length}</span><div>${dots}</div>
+    </div>
+    <div style="background:var(--cr);border:1px solid var(--cr2);border-radius:9px;padding:13px;margin-bottom:11px;font-weight:600;font-size:.89rem;line-height:1.55;color:#222">${q.q}</div>
+    ${opts}
+    <div style="display:flex;gap:7px;margin-top:11px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;gap:6px">
+        ${cur>0?btn('← Préc.',`E.cur=${cur-1};render()`,'gray','sm'):''}
+        ${cur<qs.length-1?btn('Suiv. →',`E.cur=${cur+1};render()`,'nv','sm'):''}
+      </div>${bot}
+    </div>
+  </div>`;
+}
+function qcmDone(){
+  const{qs,ans={},lbl=''}=E;
+  const score=qs.filter((_,i)=>ans[i]===qs[i].c).length;
+  const wrong=qs.flatMap((q,i)=>ans[i]!==q.c?[{level:lbl,question:q.q,given:ans[i]!=null?q.o[ans[i]]:'—',correct:q.o[q.c]}]:[]);
+  S.wr.push(...wrong);
+  if(S.scr==='l1q1'){S.res['M1-Ex1']={score,passed:pass(score)};if(pass(score)){S.pts+=50;go('l1d');}else go('l1q2',{qs:Q2,cur:0,ans:{},done:false,lbl:'M1-Rattrapage'});}
+  else if(S.scr==='l1q2'){S.res['M1-Ex2']={score,passed:pass(score)};if(pass(score))S.pts+=50;go('l1d');}
+  else if(S.scr==='l2qm'){
+    S.res['M2-QCM']={score,passed:pass(score)};
+    if(pass(S.l2s1)&&pass(score)){S.pts+=100;go('l2d');}
+    else{S.pts=Math.max(0,S.pts-25);go('l2fl');}
+  }
+}
+
+/* ═══════ V/F ═══════ */
+function vVF(){
+  const{qs,text,ans={},done=false}=E;if(!qs)return'';
+  const score=qs.filter((q,i)=>ans[i]===q.a).length;
+  const rows=qs.map((q,i)=>{
+    const bg=done?(ans[i]===q.a?'#EEF5EE':'#FBF0F0'):'#fff';
+    const bc=done?(ans[i]===q.a?'var(--green)':'var(--red)'):'#E0D9D0';
+    return`<div class="vfr" style="background:${bg};border-color:${bc}">
+      <span style="width:20px;height:20px;background:var(--nv);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:#fff;flex-shrink:0">${i+1}</span>
+      <span style="flex:1;font-weight:600;font-size:.85rem;line-height:1.4">${q.s}</span>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="tvf" onclick="${done?'':(`E.ans[${i}]=true;render()`)}" style="border-color:var(--green);color:${ans[i]===true?'#fff':'var(--green)'};background:${ans[i]===true?'var(--green)':'#fff'}">TRUE</button>
+        <button class="tvf" onclick="${done?'':(`E.ans[${i}]=false;render()`)}" style="border-color:var(--red);color:${ans[i]===false?'#fff':'var(--red)'};background:${ans[i]===false?'var(--red)':'#fff'}">FALSE</button>
+      </div>
+      ${done?`<span style="font-weight:800;color:${ans[i]===q.a?'var(--green)':'var(--red)'}">${ans[i]===q.a?'✓':'✗'}</span>`:''}
+    </div>`;
+  }).join('');
+  const allA=Object.keys(ans).length===qs.length;
+  const bot=done
+    ?`<div style="display:flex;gap:9px;width:100%;flex-wrap:wrap">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${qs.length} — ${pass(score)?'Mission réussie ✓':'Score insuffisant ✗'}</div>${btn('Continuer ›','vfDone()','nv')}</div></div>`
+    :btn('Valider',`E.done=true;render()`,'nv');
+  return`<div class="rtxt"><strong style="color:var(--gd);font-style:normal;font-size:.8rem">📄 Room 412</strong><br><br>${text.replace(/\n\n/g,'<br><br>')}</div>${rows}<div style="margin-top:11px;display:flex;justify-content:flex-end">${bot}</div>`;
+}
+function vfDone(){
+  const{qs,ans={}}=E;
+  const score=qs.filter((q,i)=>ans[i]===q.a).length;
+  const wrong=qs.flatMap((q,i)=>ans[i]!==q.a?[{level:'M2-VF',question:q.s,given:ans[i]?'TRUE':'FALSE',correct:q.a?'TRUE':'FALSE'}]:[]);
+  S.wr.push(...wrong);S.res['M2-VF']={score,passed:pass(score)};S.l2s1=score;
+  go('l2qm',{qs:Q3,cur:0,ans:{},done:false,lbl:'M2-QCM'});
+}
+
+/* ═══════ MATCHING ═══════ */
+function vMatch(){
+  const{ps,sh,sel,mt={},done=false}=E;if(!ps)return'';
+  const used=Object.values(mt);
+  const words=ps.map((p,i)=>{
+    const isM=mt[i]!=null,ok=done&&mt[i]===i,ko=done&&isM&&mt[i]!==i;
+    return`<div class="mi${sel===i?' msel':''}${isM&&!done?' mu':''}${ok?' mok':''}${ko?' mko':''}" onclick="${done||isM?'':(`selW(${i})`)}"  style="${ok?'border-color:var(--green)':ko?'border-color:var(--red)':''}">
+      <strong style="flex:1">${p.w}</strong>
+      ${isM&&!done?'<span style="color:var(--gd);font-size:.7rem">✓</span>':''}
+      ${ok?'<span style="color:var(--green)">✓</span>':''}${ko?'<span style="color:var(--red)">✗</span>':''}
+    </div>`;
+  }).join('');
+  const defs=sh.map(orig=>{
+    const isU=used.includes(orig);
+    const mKey=Object.keys(mt).find(k=>mt[k]===orig);
+    const ok=done&&mKey!=null&&Number(mKey)===orig;
+    const ko=done&&isU&&!ok;
+    return`<div class="mi${isU&&!done?' mu':''}${ok?' mok':''}${ko?' mko':''}" onclick="${isU?'':(`selD(${orig})`)}" style="${ok?'border-color:var(--green)':ko?'border-color:var(--red)':''}">${ps[orig].d}</div>`;
+  }).join('');
+  const allM=Object.keys(mt).length===ps.length;
+  const score=ps.filter((_,i)=>mt[i]===i).length;
+  const bot=done
+    ?`<div style="display:flex;gap:9px;width:100%;flex-wrap:wrap">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${ps.length} — ${pass(score)?'Mission réussie ✓':'Score insuffisant ✗'}</div>${btn('Continuer ›','matchDone()','nv')}</div></div>`
+    :(allM?btn('Valider','E.done=true;render()','nv'):`<small style="color:#CCC;font-size:.78rem">${Object.keys(mt).length}/${ps.length} associés</small>`);
+  return`<p style="color:#AAA;font-size:.79rem;margin-bottom:10px;font-weight:700">① Sélectionnez un terme → ② Sélectionnez sa définition</p>
+  <div class="mg"><div><div style="font-weight:800;color:var(--nv);font-size:.69rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Termes</div>${words}</div>
+  <div><div style="font-weight:800;color:var(--gd);font-size:.69rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Définitions</div>${defs}</div></div>
+  <div style="margin-top:12px;display:flex;justify-content:flex-end">${bot}</div>`;
+}
+function selW(i){if(E.done||E.mt[i]!=null)return;E.sel=E.sel===i?null:i;render();}
+function selD(orig){if(E.done||Object.values(E.mt||{}).includes(orig)||E.sel==null)return;if(!E.mt)E.mt={};E.mt[E.sel]=orig;E.sel=null;render();}
+function matchDone(){
+  const{ps,mt={},lbl=''}=E;
+  const score=ps.filter((_,i)=>mt[i]===i).length;
+  const wrong=ps.flatMap((p,i)=>mt[i]!==i?[{level:lbl,question:`Match: ${p.w}`,given:mt[i]!=null?ps[mt[i]]?.d:'—',correct:p.d}]:[]);
+  S.wr.push(...wrong);
+  if(S.scr==='l4e1'){S.res['M4-Ex1']={score,passed:pass(score)};if(pass(score)){S.pts+=50;go('l4d');}else go('l4e2',{ps:M2,sh:shuf(M2.map((_,i)=>i)),sel:null,mt:{},done:false,lbl:'M4-Rattrapage'});}
+  else{S.res['M4-Ex2']={score,passed:pass(score)};if(pass(score))S.pts+=50;go('l4d');}
+}
+/* ═══════ ORAL ═══════ */
+function vOral(content,isRep=false){
+  const step=E.step||'card';
+  let body='';
+  if(step==='card'){
+    const inner=isRep
+      ?`<div class="sit"><div class="slbl">📋 Incident Report</div><div style="font-weight:800;color:#222;margin-bottom:3px">${content.t}</div><div style="color:#888;font-size:.79rem;margin-bottom:9px">${content.i}</div><div style="font-size:.86rem;line-height:1.82;color:#333;font-style:italic">${content.x}</div></div>`
+      :`<div class="sit"><div class="slbl">📍 Lieu</div><div class="sval">${content.w}</div><div class="slbl">🎭 Situation</div><div class="sval">${content.who}</div><div class="slbl">Votre rôle</div><div class="sval">${content.r}</div></div>`;
+    body=`${inner}<div class="hint" style="margin-top:12px;margin-bottom:16px">${content.h}</div>
+    <div style="text-align:center"><p style="color:#888;font-size:.84rem;margin-bottom:10px">Lisez attentivement, puis préparez-vous.</p>${btn('🎤 Je suis prêt(e)','E.step="presenting";render()','nv','lg')}</div>`;
+  } else if(step==='presenting'){
+    body=`<div style="background:linear-gradient(135deg,var(--nvl),var(--gdl));border:1.5px solid var(--gd);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:1.9rem;margin-bottom:8px">🎤</div>
+      <p style="font-weight:700;color:var(--nv);margin-bottom:12px">L'élève présente son oral en anglais…</p>
+      <p style="color:#888;font-size:.82rem;margin-bottom:16px">À la fin de la présentation, le professeur valide ci-dessous.</p>
+      ${btn('👔 Validation Direction','E.step="pcode";render()','gd','lg')}
+    </div>`;
+  } else if(step==='pcode'){
+    body=`<div style="background:var(--nvl);border:1.5px solid var(--nv);border-radius:12px;padding:20px">
+      <div style="text-align:center;margin-bottom:15px"><div style="font-size:2rem">👔</div>
+        <h3 class="serif" style="color:var(--nv);margin-top:4px">Code Direction</h3>
+        <p style="color:#777;font-size:.81rem;margin-top:3px">Entrez votre code pour valider la prestation</p>
+      </div>
+      <input id="ocode" type="password" placeholder="Code professeur" style="margin-bottom:9px" onkeydown="if(event.key==='Enter')checkOCode()">
+      <div id="oerr" style="color:var(--red);font-weight:700;font-size:.81rem;min-height:15px;margin-bottom:8px"></div>
+      ${btn('Valider ›','checkOCode()','nv','full')}
+    </div>`;
+  } else if(step==='pvalidate'){
+    body=`<div style="background:var(--gdl);border:1.5px solid var(--gd);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:8px">🏅</div>
+      <h3 class="serif" style="color:var(--nv);margin-bottom:5px">Résultat de la prestation</h3>
+      <p style="color:#666;font-size:.87rem;margin-bottom:18px">Évaluez la prestation orale de l'élève</p>
+      <div style="display:flex;gap:13px">${btn('✓ Réussi','oralPass()','green','full lg')}${btn('✗ À refaire','oralFail()','red','full lg')}</div>
+    </div>`;
+  }
+  return`<div class="card card-nv fadein"><div style="text-align:center;margin-bottom:15px">
+    <div style="font-size:1.9rem">${content.e}</div>
+    <h3 class="serif" style="color:var(--nv);font-size:1.35rem;margin-top:4px">${content.t}</h3>
+  </div>${body}</div>`;
+}
+function checkOCode(){const v=(document.getElementById('ocode')||{}).value||'';if(v===S.tc){E.step='pvalidate';render();}else{const e=document.getElementById('oerr');if(e)e.textContent='Code incorrect';}}
+function oralPass(){
+  if(S.scr==='l3or'){S.res['M3-Oral']={passed:true};S.pts+=50;go('l3d');}
+  else{S.res['M5-Oral']={passed:true};S.pts+=50;go('l5d');}
+}
+function oralFail(){
+  if(S.scr==='l3or'){S.res['M3-Oral']={passed:false};if((S.l3i||0)<SIT.length-1){S.l3i++;E={step:'card'};render();}else go('l3d');}
+  else{S.res['M5-Oral']={passed:false};if((S.l5i||0)<REP.length-1){S.l5i++;E={step:'card'};render();}else go('l5d');}
+}
+
+/* ═══════ FINAL CODE ═══════ */
+function vFinal(){
+  const chips=S.rv.map(w=>`<div style="background:var(--nv);color:#fff;padding:7px 17px;border-radius:6px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.1rem;display:inline-block;margin:3px;letter-spacing:.04em">${w}</div>`).join('');
+  return`<div class="card card-nv fadein">
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:2.8rem">🔐</div>
+      <h2 class="serif" style="color:var(--nv);font-size:1.85rem;margin-top:7px">Master Code</h2>
+      <p style="color:#888;font-size:.87rem;margin-top:4px">Recomposez la phrase secrète avec vos 5 fragments</p>
+    </div>
+    <div style="background:var(--cr);border:1px solid var(--cr2);border-radius:11px;padding:17px;margin-bottom:18px">
+      <div style="font-weight:700;color:var(--nv);margin-bottom:9px;font-size:.88rem">✦ Vos fragments</div>
+      <div style="margin-bottom:7px">${chips}</div>
+      <p style="color:#AAA;font-size:.76rem;font-style:italic">Les fragments sont dans le désordre — recomposez la phrase dans le bon ordre.</p>
+    </div>
+    <label style="font-weight:700;display:block;margin-bottom:7px;font-size:.87rem;color:#333">Entrez la phrase complète :</label>
+    <input id="fc" type="text" placeholder="_ _ _ _ _ _ _ _ _ _ _ _ _" style="font-size:.98rem;text-align:center;letter-spacing:.04em;margin-bottom:9px" onkeydown="if(event.key==='Enter')checkFinal()">
+    <div id="fe" style="color:var(--red);font-weight:700;font-size:.82rem;min-height:16px;margin-bottom:10px"></div>
+    <div style="text-align:center">${btn('✦ Ouvrir The Meridian','checkFinal()','nv','lg')}</div>
+  </div>`;
+}
+function checkFinal(){
+  const v=((document.getElementById('fc')||{}).value||'').trim().toUpperCase().replace(/\s+/g,' ');
+  if(v==='WELCOME EVERY GUEST WITH CARE'){S.t1=Date.now();go('vic');}
+  else{const e=document.getElementById('fe');if(e)e.textContent=`Code incorrect. Recomposez vos ${S.rv.length} fragments dans le bon ordre.`;}
+}
+
+/* ═══════ VICTORY ═══════ */
+function vVictory(){
+  const dur=ftm(S.t0,S.t1);
+  const r=starRating(S.pts,350);
+  const parts=S.g.p.map(p=>`<span class="chip">${p.fn}-${p.ln}</span>`).join(' ');
+  return`<div style="background:var(--nv);border-radius:16px;padding:30px;text-align:center;color:#fff;margin-bottom:16px">
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.2em;color:var(--gd2);text-transform:uppercase;margin-bottom:10px">The Meridian Hotel</div>
+    <div style="font-size:2.5rem;margin-bottom:8px">🏅🎉🏨</div>
+    <h1 class="serif" style="font-size:2rem;margin-bottom:7px">Mission accomplie !</h1>
+    <p style="opacity:.85;margin-bottom:4px">The Meridian est sauvé. Bienvenue à l'équipe.</p>
+    <div class="serif" style="font-size:1.2rem;margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:10px 22px;border-radius:8px;display:inline-block;letter-spacing:.04em">
+      WELCOME EVERY GUEST WITH CARE ✦
+    </div>
+  </div>
+  <div class="card"><div style="font-weight:700;color:var(--nv);margin-bottom:13px;font-size:.9rem">✦ Rapport de mission</div>
+    <div style="text-align:center;margin-bottom:13px">${stars(r.s)} <span style="font-weight:700;color:var(--gd);margin-left:7px;font-size:.9rem">${r.msg}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px">
+      <div style="background:var(--nvl);padding:13px;border-radius:10px;text-align:center;border:1px solid rgba(13,27,62,.12)"><div class="serif" style="font-size:2rem;color:var(--nv)">${S.pts}</div><div style="color:#888;font-size:.78rem">Points</div></div>
+      <div style="background:var(--gdl);padding:13px;border-radius:10px;text-align:center;border:1px solid rgba(184,151,42,.2)"><div class="serif" style="font-size:1.5rem;color:var(--gd)">${dur}</div><div style="color:#888;font-size:.78rem">Durée</div></div>
+    </div>
+    <div style="margin-bottom:15px"><div style="font-weight:700;font-size:.87rem;margin-bottom:6px">Équipe : <span style="color:var(--nv)">${S.g.n}</span></div><div>${parts}</div></div>
+    ${btn('📋 Voir & imprimer le rapport',"go('rep')",'nv','full lg')}
+  </div>`;
+}
+
+/* ═══════ REPORT ═══════ */
+function vReport(){
+  const dur=ftm(S.t0,S.t1);
+  const LN={'M1-Ex1':'🎙️ Vocab Ex.1','M1-Ex2':'🎙️ Vocab Rattrapage','M2-VF':'📰 Lecture V/F','M2-QCM':'📰 Lecture QCM','M3-Oral':'🎤 Oral Situation','M4-Ex1':'🔗 Match Ex.1','M4-Ex2':'🔗 Match Rattrapage','M5-Oral':'📋 Rapport oral'};
+  const parts=S.g.p.map(p=>`<span class="chip">${p.fn}-${p.ln}</span>`).join(' ');
+  const rows=Object.entries(S.res).map(([k,v])=>`<tr><td style="padding:9px;font-weight:700;font-size:.83rem">${LN[k]||k}</td><td style="padding:9px"><span style="background:${v.passed?'var(--green)':'var(--red)'};color:#fff;padding:2px 9px;border-radius:5px;font-size:.72rem;font-weight:800">${v.passed?'✓ Réussi':'✗ Non réussi'}</span></td><td style="padding:9px;color:#777;font-size:.83rem">${v.score!=null?`${v.score}/10`:typeof v.passed==='boolean'?(v.passed?'Réussi':'Non réussi'):'—'}</td></tr>`).join('');
+  const errs=S.wr.length===0
+    ?`<div class="ok" style="text-align:center;margin-top:6px">✦ Aucune erreur — Prestation sans faute</div>`
+    :S.wr.map(w=>`<div style="background:#fff;border:1px solid #F0D8D8;border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-weight:700;font-size:.83rem;color:#222">${w.question}</div><div style="color:var(--red);font-size:.79rem;margin-top:3px">✗ Réponse donnée : ${w.given||'—'}</div><div style="color:var(--green);font-size:.79rem">✓ Réponse correcte : ${w.correct}</div></div>`).join('');
+  return`<div style="max-width:780px;margin:0 auto;padding:20px 18px 44px">
+  <div class="noprint" style="margin-bottom:13px;display:flex;gap:8px;flex-wrap:wrap">
+    ${btn('← Retour',"go('vic')",'gray','sm')}
+    ${btn('🖨️ Imprimer / PDF','window.print()','nv','sm')}
+  </div>
+  <div style="background:var(--nv);border-radius:14px;padding:26px;text-align:center;color:#fff;margin-bottom:15px;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:.22em;color:var(--gd2);text-transform:uppercase;margin-bottom:6px">The Meridian Hotel — English Escape Game</div>
+    <div class="serif" style="font-size:1.65rem">Rapport de Mission</div>
+    <div style="opacity:.65;font-size:.78rem;margin-top:5px">${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px">
+    <div class="card" style="text-align:center;border-top:2px solid var(--nv)"><div style="font-weight:800;font-size:.97rem;color:var(--nv)">${S.g.n}</div><div style="color:#888;font-size:.76rem;margin-top:3px">Équipe</div><div style="margin-top:7px">${parts}</div></div>
+    <div class="card" style="text-align:center;border-top:2px solid var(--gd)"><div class="serif" style="font-size:1.85rem;color:var(--nv)">${S.pts}</div><div style="color:#888;font-size:.76rem">Points • ${dur}</div><div style="margin-top:5px">${stars(starRating(S.pts,350).s)}</div></div>
+  </div>
+  <div class="card"><div style="font-weight:700;color:var(--nv);margin-bottom:11px;font-size:.88rem">✦ Résultats par mission</div>
+    <table style="width:100%;border-collapse:collapse"><tr style="background:var(--nvl)"><th style="padding:9px;text-align:left;font-size:.78rem;font-weight:800">Mission</th><th style="padding:9px;text-align:left;font-size:.78rem;font-weight:800">Résultat</th><th style="padding:9px;text-align:left;font-size:.78rem;font-weight:800">Score</th></tr>${rows}</table>
+  </div>
+  <div class="card"><div style="font-weight:700;color:var(--red);margin-bottom:11px;font-size:.88rem">✦ Erreurs commises</div>${errs}</div>
+  <div style="background:var(--nv);border-radius:11px;padding:13px 20px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--gd2);margin-bottom:13px;letter-spacing:.04em;print-color-adjust:exact;-webkit-print-color-adjust:exact">✦ WELCOME EVERY GUEST WITH CARE</div>
+  <div style="text-align:center;color:#BBB;font-size:.74rem">Créé par C. iemfre · The Meridian Hotel — English Escape Game · Bac Pro Métiers de l'Accueil</div>
+  </div>`;
+}
+
+/* ═══════ RGPD ═══════ */
+function vRGPD(){
+  return`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card fadein" style="max-width:490px;width:100%;border-top:3px solid var(--gd)">
+    <div style="color:#AAA;cursor:pointer;font-size:.82rem;margin-bottom:13px" onclick="go('home')">← Accueil</div>
+    <div style="text-align:center;margin-bottom:17px"><div style="font-size:2.4rem">🔒</div>
+      <h2 class="serif" style="color:var(--nv);margin-top:6px">Politique RGPD</h2>
+    </div>
+    <div style="background:var(--cr);border:1px solid var(--cr2);border-radius:10px;padding:15px;color:#555;line-height:1.88;font-size:.88rem">
+      <p style="font-weight:700;color:#333;margin-bottom:9px">Cette page sera complétée ultérieurement.</p>
+      <p>Les données saisies dans cette application (nom d'équipe, identifiants participants) ne sont pas transmises à des serveurs tiers et restent uniquement en mémoire locale durant la session.</p>
+      <p style="margin-top:9px">Aucune donnée n'est conservée après fermeture de la page.</p>
+    </div>
+  </div></div>`;
+}
+
+/* ═══════ ROUTER ═══════ */
+function go(scr,ei={}){E=ei;S.scr=scr;render();window.scrollTo(0,0);}
+function render(){document.getElementById('app').innerHTML=view();}
+function view(){
+  const sc=S.scr;
+  if(sc==='home')return vHome();
+  if(sc==='rules')return vRules();
+  if(sc==='rgpd')return vRGPD();
+  if(sc==='tlg')return vLogin('Interface Direction','tdb');
+  if(sc==='tdb')return vTeacher();
+  if(sc==='slg')return vLogin('Enregistrement Équipe','grp');
+  if(sc==='grp')return vGroup();
+  const H=hdr;
+  /* Mission 1 */
+  if(sc==='l1i')return H(1)+`<div class="page">${lvlIntro('🎙️','Mission 1 — Front Desk Briefing','Vocabulaire hôtelier','<p style="font-weight:700;margin-bottom:7px">Welcome to The Meridian!</p><p style="font-size:.88rem;color:#555;line-height:1.72">Avant d\'accéder à la réception, prouvez que vous maîtrisez le vocabulaire essentiel de l\'hôtellerie. 10 questions · Seuil ≥ 8/10.</p>',"go('l1q1',{qs:Q1,cur:0,ans:{},done:false,lbl:'M1-Ex1'})")}</div>`;
+  if(sc==='l1q1')return H(1)+`<div class="page"><div class="card card-nv"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--nv);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Ex. 1</span><strong style="font-size:.93rem">QCM — Vocabulaire hôtelier</strong></div>${vQCM()}</div></div>`;
+  if(sc==='l1q2')return H(1)+`<div class="page"><div class="ko" style="margin-bottom:11px">Score insuffisant — exercice de rattrapage</div><div class="card card-gd"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--gd);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Rattrapage</span><strong style="font-size:.93rem">QCM — Vocabulaire (2)</strong></div>${vQCM()}</div></div>`;
+  if(sc==='l1d')return H(1)+`<div class="page">${indiceScreen(0,"go('l2i')")}</div>`;
+  /* Mission 2 */
+  if(sc==='l2i')return H(2)+`<div class="page">${lvlIntro('📰','Mission 2 — Guest Intelligence','Compréhension écrite','<p style="font-weight:700;margin-bottom:7px">A guest file has been retrieved!</p><p style="font-size:.88rem;color:#555;line-height:1.72">Deux textes professionnels, deux exercices <strong>obligatoires</strong>. ≥ 8/10 aux deux pour avancer.</p><p style="color:var(--red);font-weight:700;font-size:.83rem;margin-top:8px">⚠ Échec = −25 pts + retour Mission 1</p>',"go('l2vf',{qs:VF,text:T1,ans:{},done:false})")}</div>`;
+  if(sc==='l2vf')return H(2)+`<div class="page"><div class="card card-nv"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--nv);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Ex. 1 / 2</span><strong style="font-size:.93rem">Vrai / Faux — The Returns Desk</strong></div>${vVF()}</div></div>`;
+  if(sc==='l2qm')return H(2)+`<div class="page"><div class="card card-nv"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--nv);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Ex. 2 / 2</span><strong style="font-size:.93rem">QCM — The Weekly Briefing</strong></div><div class="rtxt"><strong style="color:var(--gd);font-style:normal;font-size:.8rem">📄 The Weekly Front-of-House Briefing</strong><br><br>${T2.replace(/\n\n/g,'<br><br>')}</div>${vQCM()}</div></div>`;
+  if(sc==='l2fl')return H(2)+`<div class="page"><div class="card" style="text-align:center;padding:30px 20px"><div style="font-size:2.3rem;margin-bottom:8px">😓</div><h2 class="serif" style="color:var(--red);margin-bottom:10px">Score insuffisant</h2><p style="color:#555;margin-bottom:13px;font-size:.89rem">≥ 80% requis aux deux exercices pour accéder à la Mission 3.</p><div class="ko" style="margin-bottom:20px">−25 points appliqués · Retour Mission 1</div>${btn('Retour Mission 1',"go('l1i')",'red','lg')}</div></div>`;
+  if(sc==='l2d')return H(2)+`<div class="page">${indiceScreen(1,"go('l3i')")}</div>`;
+  /* Mission 3 */
+  if(sc==='l3i')return H(3)+`<div class="page">${lvlIntro('🎤','Mission 3 — Live Situation','Expression orale','<p style="font-weight:700;margin-bottom:7px">A guest situation requires immediate attention!</p><p style="font-size:.88rem;color:#555;line-height:1.72">Un membre de l\'équipe est tiré au sort. Il lit la carte, puis gère la situation en anglais, sans notes ni préparation.</p>',"go('l3or',{step:'card'});S.l3i=0")}</div>`;
+  if(sc==='l3or')return H(3)+`<div class="page">${vOral(SIT[S.l3i||0])}</div>`;
+  if(sc==='l3d')return H(3)+`<div class="page">${indiceScreen(2,"go('l4i')")}</div>`;
+  /* Mission 4 */
+  if(sc==='l4i')return H(4)+`<div class="page">${lvlIntro('🔗','Mission 4 — The Concierge Desk','Correspondance terminologique','<p style="font-weight:700;margin-bottom:7px">The concierge files are scrambled!</p><p style="font-size:.88rem;color:#555;line-height:1.72">Associez chaque terme hôtelier à sa définition exacte. ⏱ 6 minutes recommandées · Seuil ≥ 8/10.</p>',"go('l4e1',{ps:M1,sh:shuf(M1.map((_,i)=>i)),sel:null,mt:{},done:false,lbl:'M4-Ex1'})")}</div>`;
+  if(sc==='l4e1')return H(4)+`<div class="page"><div class="card card-nv"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--gd);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Ex. 1</span><strong style="font-size:.93rem">Correspondance — Série A</strong></div>${vMatch()}</div></div>`;
+  if(sc==='l4e2')return H(4)+`<div class="page"><div class="ko" style="margin-bottom:11px">Score insuffisant — nouvelle série</div><div class="card card-gd"><div style="display:flex;gap:8px;align-items:center;margin-bottom:11px"><span style="background:var(--gd);color:#fff;padding:3px 12px;border-radius:5px;font-weight:800;font-size:.79rem">Rattrapage</span><strong style="font-size:.93rem">Correspondance — Série B</strong></div>${vMatch()}</div></div>`;
+  if(sc==='l4d')return H(4)+`<div class="page">${indiceScreen(3,"go('l5i')")}</div>`;
+  /* Mission 5 */
+  if(sc==='l5i')return H(5)+`<div class="page">${lvlIntro('📋',"Mission 5 — The Duty Manager's Office",'Compte rendu oral','<p style="font-weight:700;margin-bottom:7px">The duty manager needs your report!</p><p style="font-size:.88rem;color:#555;line-height:1.72">Lisez la fiche d\'incident et présentez un compte rendu structuré en anglais. Langage professionnel exigé.</p>',"go('l5or',{step:'card'});S.l5i=0")}</div>`;
+  if(sc==='l5or')return H(5)+`<div class="page">${vOral(REP[S.l5i||0],true)}</div>`;
+  if(sc==='l5d')return H(5)+`<div class="page">${indiceScreen(4,"go('fin')")}</div>`;
+  /* Final */
+  if(sc==='fin')return H(5)+`<div class="page">${vFinal()}</div>`;
+  if(sc==='vic')return H(5)+`<div class="page">${vVictory()}</div>`;
+  if(sc==='rep')return vReport();
+  return'<p>Écran inconnu</p>';
+}
+render();
+</script></body></html>
