@@ -203,7 +203,7 @@ const REP=[
 ];
 const WW=['WELCOME','EVERY','GUEST','WITH','CARE'];
 /* ═══════ STATE & UTILS ═══════ */
-let S={scr:'home',tc:'0504',sc:'1234',g:{n:'',p:[]},pts:0,sh:[],rv:[],res:{},wr:[],t0:null,t1:null,l2s1:null,l3i:0,l5i:0,np:1};
+let S={scr:'home',tc:'0504',sc:'1CVA2627',g:{n:'',p:[]},pts:0,sh:[],rv:[],res:{},wr:[],t0:null,t1:null,l2s1:null,l3i:0,l5i:0,np:1};
 let E={};let F={};
 const shuf=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
 const pass=(n,t=10)=>n>=t*.8;
@@ -366,10 +366,8 @@ function vTeacher(){
     ${btn('← Accueil',"go('home')",'gray','sm')}
   </div>
   <div class="card card-gd"><div style="font-weight:700;color:var(--gd);margin-bottom:11px;font-size:.9rem">✦ Code d'accès équipes</div>
-    <p style="color:#777;font-size:.87rem;margin-bottom:9px">Code actuel : <strong style="color:var(--nv);font-family:monospace;font-size:1.2rem">${S.sc}</strong></p>
-    <div style="display:flex;gap:9px"><input id="nsc" type="text" value="${S.sc}" placeholder="Nouveau code" style="flex:1">
-    ${btn('Enregistrer','saveCode()','nv')}</div>
-    <div id="scs" style="color:var(--green);font-weight:700;font-size:.82rem;min-height:15px;margin-top:6px"></div>
+    <p style="color:#777;font-size:.87rem;margin-bottom:5px">Code fixé par l'enseignant : <strong style="color:var(--nv);font-family:monospace;font-size:1.15rem">1CVA2627</strong></p>
+    <p style="color:#AAA;font-size:.78rem">Communiquez ce code aux équipes avant de lancer le jeu.</p>
   </div>
   <div class="card card-nv"><div style="font-weight:700;color:var(--nv);margin-bottom:11px;font-size:.9rem">✦ Récapitulatif</div>
     ${[['Master Code','WELCOME EVERY GUEST WITH CARE (fragments révélés dans le désordre)'],
@@ -384,7 +382,6 @@ function vTeacher(){
     ].map(([k,v])=>`<div style="background:var(--gdl);padding:10px 13px;border-radius:8px;border:1px solid rgba(184,151,42,.3);margin-bottom:8px;font-size:.85rem"><strong style="color:var(--gd)">${k} :</strong> <span style="color:#555">${v}</span></div>`).join('')}
   </div></div></div>`;
 }
-function saveCode(){const v=(document.getElementById('nsc')||{}).value||'';if(v)S.sc=v;const e=document.getElementById('scs');if(e){e.textContent='✓ Code mis à jour';setTimeout(()=>{if(e)e.textContent='';},2200);}}
 
 /* ═══════ GROUP ═══════ */
 function vGroup(){
@@ -685,16 +682,35 @@ function vReport(){
 
 /* ═══════ RGPD ═══════ */
 function vRGPD(){
-  return`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
-  <div class="card fadein" style="max-width:490px;width:100%;border-top:3px solid var(--gd)">
-    <div style="color:#AAA;cursor:pointer;font-size:.82rem;margin-bottom:13px" onclick="go('home')">← Accueil</div>
-    <div style="text-align:center;margin-bottom:17px"><div style="font-size:2.4rem">🔒</div>
-      <h2 class="serif" style="color:var(--nv);margin-top:6px">Politique RGPD</h2>
+  return`<div style="min-height:100vh;padding:20px 18px 40px">
+  <div style="max-width:580px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-top:8px">
+      <span style="color:#AAA;cursor:pointer;font-size:.82rem;font-weight:700" onclick="go('home')">← Retour</span>
     </div>
-    <div style="background:var(--cr);border:1px solid var(--cr2);border-radius:10px;padding:15px;color:#555;line-height:1.88;font-size:.88rem">
-      <p style="font-weight:700;color:#333;margin-bottom:9px">Cette page sera complétée ultérieurement.</p>
-      <p>Les données saisies dans cette application (nom d'équipe, identifiants participants) ne sont pas transmises à des serveurs tiers et restent uniquement en mémoire locale durant la session.</p>
-      <p style="margin-top:9px">Aucune donnée n'est conservée après fermeture de la page.</p>
+    <div style="background:linear-gradient(135deg,var(--nv),var(--nv2));border-radius:16px;padding:26px;text-align:center;color:#fff;margin-bottom:18px;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+      <div style="font-size:2.4rem;margin-bottom:8px">🔒</div>
+      <h1 class="serif" style="font-size:1.55rem;margin-bottom:4px;font-weight:700">Protection des données personnelles</h1>
+      <p style="opacity:.75;font-size:.82rem">The Meridian Hotel — English Escape Game</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--gd);margin-bottom:10px">
+      <p style="color:#333;font-size:.9rem;line-height:1.82">Cette application est un outil pédagogique développé pour un usage en classe.</p>
+    </div>
+    <div style="display:grid;gap:9px;margin-bottom:18px">
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Aucun cookie tiers, aucun traceur publicitaire, aucun appel à une API externe n'est utilisé.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom (utilisées uniquement pour générer un identifiant au format XX-YY, sans jamais collecter votre identité complète), ainsi que vos réponses aux exercices.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Ces données ne sont jamais sauvegardées : elles disparaissent automatiquement si vous rechargez ou fermez la page. Pensez à télécharger votre PDF de résultats avant de quitter l'application.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</p>
+      </div>
     </div>
   </div></div>`;
 }
